@@ -1,0 +1,579 @@
+/**
+ * MA3 - Main Styles
+ */
+
+.app {
+  min-height:  100vh;
+  display:  flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* MENU SCREEN */
+.menu-screen {
+  text-align: center;
+  color: white;
+  padding: 2rem;
+}
+
+.game-title {
+  font-size: 5rem;
+  margin-bottom:  1rem;
+  text-shadow: 0 4px 20px rgba(0,0,0,0.5);
+}
+
+.subtitle {
+  font-size: 1.5rem;
+  margin-bottom:  3rem;
+  opacity: 0.9;
+}
+
+.menu-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 400px;
+  margin: 0 auto 2rem;
+}
+
+.btn {
+  padding: 1rem 2rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-transform: uppercase;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+}
+
+.btn-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.6);
+}
+
+.btn-secondary {
+  background: rgba(255,255,255,0.2);
+  color: white;
+  border: 2px solid rgba(255,255,255,0.3);
+}
+
+.btn-secondary:hover {
+  background: rgba(255,255,255,0.3);
+}
+
+.btn-danger {
+  background: #ef4444;
+  color: white;
+}
+
+.high-score {
+  font-size: 1.5rem;
+  color:  #fbbf24;
+  font-weight: 700;
+}
+
+/* MATATU SELECT SCREEN */
+.matatu-select-screen {
+  padding: 2rem;
+  color: white;
+  max-width: 1200px;
+}
+
+.matatu-select-screen h2 {
+  font-size: 2.5rem;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.matatu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.matatu-card {
+  background: rgba(255,255,255,0.1);
+  border: 2px solid rgba(255,255,255,0.2);
+  border-radius: 16px;
+  padding: 1.5rem;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.matatu-card:hover {
+  background: rgba(255,255,255,0.2);
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.matatu-emoji {
+  font-size:  4rem;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.matatu-card h3 {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.matatu-card .route {
+  font-size:  0.9rem;
+  opacity: 0.8;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.features {
+  display: flex;
+  flex-wrap: wrap;
+  gap:  0.5rem;
+  justify-content: center;
+}
+
+.tag {
+  background: rgba(255,255,255,0.2);
+  padding: 0.3rem 0.6rem;
+  border-radius:  8px;
+  font-size:  0.75rem;
+}
+
+/* GAME SCREEN */
+.game-screen {
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+  height: 600px;
+}
+
+/* HUD */
+.hud {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0,0,0,0.8);
+  padding: 1rem;
+  display: flex;
+  justify-content: space-around;
+  z-index: 100;
+}
+
+.hud .stat {
+  text-align: center;
+  color: white;
+}
+
+.hud .stat span {
+  display: block;
+  font-size: 0.8rem;
+  opacity: 0.8;
+  margin-bottom: 0.2rem;
+}
+
+.hud .stat strong {
+  display: block;
+  font-size: 1.5rem;
+  color: #10b981;
+}
+
+/* GAME CANVAS */
+.game-canvas {
+  position: relative;
+  width: 100%;
+  height: 600px;
+  background: linear-gradient(180deg, #87CEEB 0%, #E0F6FF 100%);
+  overflow: hidden;
+}
+
+/* ROAD */
+.road {
+  position: absolute;
+  bottom: 0;
+  left:  0;
+  right: 0;
+  height:  500px;
+  background: #444;
+  border-top: 5px solid #666;
+}
+
+.lane-line {
+  position: absolute;
+  width: 4px;
+  height: 100%;
+  background: repeating-linear-gradient(
+    to bottom,
+    #FFD700 0px,
+    #FFD700 30px,
+    transparent 30px,
+    transparent 60px
+  );
+  top: 0;
+  animation: scrollLane 0.5s linear infinite;
+}
+
+.lane-line.left {
+  left: 33.33%;
+}
+
+.lane-line.right {
+  right: 33.33%;
+}
+
+@keyframes scrollLane {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 0 60px;
+  }
+}
+
+/* PLAYER */
+.player {
+  position: absolute;
+  bottom: 50px;
+  font-size: 3. 5rem;
+  transition: left 0.15s ease;
+  z-index: 50;
+  transform: translateX(-50%);
+  animation: bounce 0.6s ease infinite alternate;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+}
+
+@keyframes bounce {
+  from {
+    transform: translateX(-50%) translateY(0);
+  }
+  to {
+    transform:  translateX(-50%) translateY(-8px);
+  }
+}
+
+/* OBSTACLES */
+.obstacle {
+  position: absolute;
+  font-size: 3rem;
+  transform: translateX(-50%);
+  z-index: 40;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.2));
+}
+
+/* COLLECTIBLES */
+.collectible {
+  position: absolute;
+  font-size: 2.5rem;
+  transform: translateX(-50%);
+  z-index: 40;
+  animation: spin 1s linear infinite;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.2));
+}
+
+@keyframes spin {
+  0% {
+    transform: translateX(-50%) rotate(0deg) scale(1);
+  }
+  50% {
+    transform: translateX(-50%) rotate(180deg) scale(1.2);
+  }
+  100% {
+    transform: translateX(-50%) rotate(360deg) scale(1);
+  }
+}
+
+/* TRAFFIC LIGHTS */
+.traffic-light {
+  position: absolute;
+  font-size: 3rem;
+  transform: translateX(-50%);
+  z-index: 45;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.3));
+}
+
+.traffic-light.red {
+  animation: pulse-red 1s ease infinite;
+}
+
+@keyframes pulse-red {
+  0%, 100% {
+    filter: drop-shadow(0 0 10px red);
+  }
+  50% {
+    filter: drop-shadow(0 0 20px red);
+  }
+}
+
+/* POLICE */
+.police {
+  position: absolute;
+  font-size: 3rem;
+  transform: translateX(-50%);
+  z-index: 55;
+  animation: wobble 0.3s ease infinite;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.3));
+}
+
+@keyframes wobble {
+  0%, 100% {
+    transform:  translateX(-50%) rotate(-3deg);
+  }
+  50% {
+    transform: translateX(-50%) rotate(3deg);
+  }
+}
+
+/* MESSAGES */
+.conductor-message,
+.passenger-message,
+.police-message {
+  position:  absolute;
+  top: 120px;
+  left: 50%;
+  transform:  translateX(-50%);
+  background: rgba(0,0,0,0.9);
+  color: white;
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  font-size:  1.2rem;
+  font-weight: 700;
+  z-index: 90;
+  animation: slideDown 0.3s ease;
+  max-width: 80%;
+  text-align: center;
+}
+
+.conductor-message {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.passenger-message {
+  background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+}
+
+.police-message {
+  background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform:  translateX(-50%) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform:  translateX(-50%) translateY(0);
+  }
+}
+
+/* CONTROLS HINT */
+.controls-hint {
+  position:  absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.7);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  z-index: 90;
+}
+
+/* PAUSE OVERLAY */
+.pause-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom:  0;
+  background: rgba(0,0,0,0.9);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 95;
+  color: white;
+}
+
+.pause-overlay h2 {
+  font-size: 3rem;
+  margin-bottom:  1rem;
+  animation: pulse 1. 5s ease infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+/* GAME OVER SCREEN */
+.game-over-screen {
+  padding: 2rem;
+  color: white;
+  text-align: center;
+  max-width: 600px;
+}
+
+.game-over-screen h1 {
+  font-size: 3rem;
+  margin-bottom: 2rem;
+}
+
+.stats {
+  background: rgba(255,255,255,0.1);
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom:  2rem;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.8rem 0;
+  border-bottom: 1px solid rgba(255,255,255,0.2);
+  font-size: 1.1rem;
+}
+
+.stat-row:last-child {
+  border-bottom: none;
+}
+
+.stat-row strong {
+  color: #10b981;
+  font-size: 1.3rem;
+}
+
+.new-high-score {
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  animation: celebrate 0.5s ease infinite alternate;
+}
+
+@keyframes celebrate {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.05);
+  }
+}
+
+.buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+/* POLICE STATION SCREEN */
+.police-station-screen {
+  padding: 2rem;
+  color: white;
+  text-align: center;
+  max-width: 600px;
+}
+
+.police-station-screen h1 {
+  font-size:  3rem;
+  margin-bottom: 2rem;
+}
+
+.police-dialogue {
+  background: rgba(239, 68, 68, 0.2);
+  border: 2px solid #ef4444;
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  font-size: 1.3rem;
+  font-weight: 700;
+  line-height: 1.6;
+}
+
+.violation-info {
+  background: rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.violation-info h3 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: #fbbf24;
+}
+
+.fine {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #ef4444;
+}
+
+/* RESPONSIVE */
+@media (max-width:  768px) {
+  .game-title {
+    font-size: 3. 5rem;
+  }
+
+  .subtitle {
+    font-size: 1.2rem;
+  }
+
+  .game-canvas {
+    height: 500px;
+  }
+
+  .player {
+    font-size:  2.5rem;
+  }
+
+  .obstacle,
+  .traffic-light,
+  .police {
+    font-size: 2rem;
+  }
+
+  .collectible {
+    font-size:  1.8rem;
+  }
+
+  .hud .stat strong {
+    font-size: 1.2rem;
+  }
+
+  .conductor-message,
+  .passenger-message,
+  .police-message {
+    font-size: 1rem;
+    padding: 0.8rem 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .game-canvas {
+    height: 400px;
+  }
+
+  .matatu-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .buttons {
+    flex-direction: column;
+  }
+}

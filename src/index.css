@@ -1,0 +1,197 @@
+/**
+ * MA3 - Global Styles
+ * Base styles and CSS variables
+ */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  /* Kenyan Flag Colors */
+  --kenya-black: #000000;
+  --kenya-red: #BB0000;
+  --kenya-green: #006600;
+  --kenya-white: #FFFFFF;
+  
+  /* Matatu Colors */
+  --matatu-purple: #667eea;
+  --matatu-dark:  #764ba2;
+  --nganya-pink: #FF1493;
+  --nganya-green: #00FF00;
+  --nganya-orange: #FF4500;
+  
+  /* Police & Traffic */
+  --police-blue: #0047AB;
+  --traffic-red: #FF0000;
+  --traffic-yellow: #FFD700;
+  --traffic-green: #00FF00;
+  
+  /* Road Colors */
+  --tarmac:  #444444;
+  --road-lines: #FFD700;
+  --grass: #228B22;
+  --dirt: #8B4513;
+  
+  /* Status Colors */
+  --success: #10b981;
+  --warning: #fbbf24;
+  --danger: #ef4444;
+  --info: #3b82f6;
+  
+  /* Neutral Colors */
+  --white: #ffffff;
+  --gray-50: #f9fafb;
+  --gray-100: #f3f4f6;
+  --gray-300: #d1d5db;
+  --gray-500: #6b7280;
+  --gray-700: #374151;
+  --gray-900: #111827;
+  --black: #000000;
+  
+  /* Spacing */
+  --space-xs:  4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  
+  /* Border Radius */
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-full: 9999px;
+  
+  /* Font Family */
+  --font-main: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 
+    'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 
+    'Helvetica Neue', sans-serif;
+  
+  /* Shadows */
+  --shadow-sm:  0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  
+  /* Z-index layers */
+  --z-background: 0;
+  --z-road: 10;
+  --z-buildings: 20;
+  --z-pedestrians: 30;
+  --z-vehicles: 40;
+  --z-player: 50;
+  --z-effects: 60;
+  --z-ui: 70;
+  --z-overlay: 80;
+  --z-modal: 90;
+  --z-toast: 100;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-main);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: linear-gradient(135deg, var(--matatu-purple) 0%, var(--matatu-dark) 100%);
+  overflow:  hidden;
+  min-height: 100vh;
+  color: var(--gray-900);
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+
+/* Accessibility */
+button:focus-visible,
+a:focus-visible {
+  outline: 3px solid var(--warning);
+  outline-offset: 2px;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Selection colors (Kenyan theme) */
+::selection {
+  background-color: var(--kenya-red);
+  color: var(--white);
+}
+
+::-moz-selection {
+  background-color: var(--kenya-red);
+  color: var(--white);
+}
+
+/* Custom scrollbar (for modals/dialogs) */
+::-webkit-scrollbar {
+  width:  10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--gray-100);
+  border-radius: var(--radius-sm);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--matatu-purple);
+  border-radius: var(--radius-sm);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background:  var(--matatu-dark);
+}
+
+/* Disable text selection during gameplay */
+.game-active {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+/* Disable transitions during gameplay (performance) */
+.game-active * {
+  transition: none !important;
+  animation-duration: 0s !important;
+}
+
+/* Loading state */
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  font-size: 2rem;
+  color: var(--white);
+}
+
+/* Utility classes */
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+
+.hidden { display: none; }
+.visible { visibility: visible; }
+.invisible { visibility: hidden; }
+
+/* Responsive breakpoints */
+@media (max-width: 640px) {
+  :root {
+    --space-lg: 16px;
+    --space-xl: 24px;
+    --space-2xl: 32px;
+  }
+}
