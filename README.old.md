@@ -67,12 +67,18 @@ text
     │   └── stages.js
     ├── game3d
     │   ├── components
-    │   │   └── Game3D.jsx
+    │   │   ├── Game3D.jsx
+    │   │   ├── ImprovedHUD.css
+    │   │   └── ImprovedHUD.jsx
+    │   ├── effects
+    │   │   └── PostProcessing.jsx
     │   ├── engine
     │   │   ├── GameEngine.js
     │   │   ├── NairobiWorld.js
     │   │   ├── VehiclePhysics.js
     │   │   └── index.js
+    │   ├── models
+    │   │   └── Matatu3D.jsx
     │   ├── particles
     │   │   └── DustSystem.js
     │   ├── styles
@@ -103,6 +109,6 @@ text
         ├── policeSystem.js
         └── trafficRules.js
 
-27 directories, 75 files
+29 directories, 79 files
 
 <!-- TREE_END -->

@@ -1,317 +1,398 @@
 /**
- * MA3 - 3D GAME COMPONENT
- * React wrapper for the 3D game engine
+ * MA3 - GAME ENGINE WITH ALL UPGRADES
+ * Post-processing, 3D Matatu, Improved HUD
  */
 
-import React, { useEffect, useRef, useState } from 'react';
-import GameEngine from '../engine/GameEngine';
-import VehiclePhysics from '../engine/VehiclePhysics';
-import NairobiWorld from '../engine/NairobiWorld';
-import ConductorSystem from '../systems/ConductorSystem';
-import PoliceSystem from '../systems/PoliceSystem';
-import '../styles/Game3D.css';
+import React, { useState, useRef, useEffect, Suspense } from 'react';
+import { Canvas } from '@react-three/fiber';
+import { Sky, Stars, Environment } from '@react-three/drei';
+import * as THREE from 'three';
+
+// Import new components
+import PostProcessing from '../effects/PostProcessing';
+import Matatu3D from '../models/Matatu3D';
+import ImprovedHUD from './ImprovedHUD';
+
+// Ground component
+const Ground = () => {
+  return (
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} receiveShadow>
+      <planeGeometry args={[1000, 1000]} />
+      <meshStandardMaterial color="#2a2a2a" />
+    </mesh>
+  );
+};
+
+// Road component
+const Road = ({ position = [0, 0, 0] }) => {
+  return (
+    <group position={position}>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.01, 0]} receiveShadow>
+        <planeGeometry args={[10, 1000]} />
+        <meshStandardMaterial color="#1a1a1a" />
+      </mesh>
+      
+      {/* Road lines */}
+      {[...Array(50)].map((_, i) => (
+        <mesh
+          key={i}
+          position={[0, 0.02, i * 20 - 500]}
+          rotation={[-Math.PI / 2, 0, 0]}
+        >
+          <planeGeometry args={[0.3, 5]} />
+          <meshBasicMaterial color="#FFD700" />
+        </mesh>
+      ))}
+    </group>
+  );
+};
+
+// Simple building
+const Building = ({ position, height, color }) => {
+  return (
+    <mesh position={position} castShadow receiveShadow>
+      <boxGeometry args={[8, height, 8]} />
+      <meshStandardMaterial color={color} roughness={0.8} />
+    </mesh>
+  );
+};
 
 const Game3D = ({ selectedMatatu, onExit }) => {
-  const canvasRef = useRef(null);
-  const engineRef = useRef(null);
-  const vehicleRef = useRef(null);
-  const worldRef = useRef(null);
-  const conductorRef = useRef(null);
-  const policeRef = useRef(null);
-  const animationFrameRef = useRef(null);
+  // Game state
+  const [gameTime, setGameTime] = useState(12);
+  const [isNight, setIsNight] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
   
-  const [gameState, setGameState] = useState({
-    speed: 0,
-    rpm: 0,
-    gear: 1,
-    score: 0,
-    money: 0,
-    passengers: 0,
-    fps: 60,
-    time: '12:00'
+  // Vehicle state
+  const [position, setPosition] = useState([0, 1, 0]);
+  const [rotation, setRotation] = useState([0, 0, 0]);
+  const [speed, setSpeed] = useState(0);
+  const [rpm, setRpm] = useState(800);
+  const [gear, setGear] = useState(1);
+  
+  // Game metrics
+  const [money, setMoney] = useState(500);
+  const [passengers, setPassengers] = useState(0);
+  const [health, setHealth] = useState(100);
+  
+  // Mission state
+  const [currentMission, setCurrentMission] = useState({
+    title: 'Pick up passengers',
+    description: 'Stop at 3 matatu stages',
+    progress: 0
   });
   
-  const [isPaused, setIsPaused] = useState(false);
-  const [showControls, setShowControls] = useState(true);
-
+  // Police chase
+  const [policeChaseActive, setPoliceChaseActive] = useState(false);
+  
+  // Controls
+  const keysPressed = useRef({});
+  
+  // Day/night cycle
   useEffect(() => {
-    if (!canvasRef.current) return;
+    const interval = setInterval(() => {
+      setGameTime(prev => {
+        const newTime = (prev + 0.1) % 24;
+        setIsNight(newTime < 6 || newTime > 18);
+        return newTime;
+      });
+    }, 1000);
     
-    console.log('🎮 Initializing 3D Game...');
-    console.log('Selected Matatu:', selectedMatatu);
-    
-    try {
-      // Initialize systems
-      engineRef.current = new GameEngine(canvasRef.current);
-      worldRef.current = new NairobiWorld(engineRef.current);
-      vehicleRef.current = new VehiclePhysics(engineRef.current, selectedMatatu);
-      conductorRef.current = new ConductorSystem();
-      policeRef.current = new PoliceSystem();
-      
-      console.log('✅ All systems initialized');
-      
-      startGameLoop();
-      console.log('🔍 Engine:', engineRef.current);
-      console.log('🔍 Vehicle:', vehicleRef.current);
-      console.log('🔍 World:', worldRef.current);
-      console.log('🔍 Scene children:', engineRef.current?.scene.children.length);
-      
-      // Hide controls after 5 seconds
-      const controlsTimer = setTimeout(() => {
-        setShowControls(false);
-      }, 5000);
-      
-      return () => {
-        clearTimeout(controlsTimer);
-        stopGameLoop();
-        if (vehicleRef.current) vehicleRef.current.dispose();
-        if (engineRef.current) engineRef.current.dispose();
-      };
-    } catch (error) {
-      console.error('❌ Error initializing 3D game:', error);
-    }
-  }, [selectedMatatu]);
-
+    return () => clearInterval(interval);
+  }, []);
+  
+  // Keyboard controls
   useEffect(() => {
-    const handleEscape = (e) => {
+    const handleKeyDown = (e) => {
+      keysPressed.current[e.key.toLowerCase()] = true;
+      
       if (e.key === 'Escape') {
-        setIsPaused(!isPaused);
+        setIsPaused(prev => !prev);
+      }
+      
+      if (e.key === 'q' || e.key === 'Q') {
+        if (window.confirm('Return to main menu?')) {
+          onExit();
+        }
       }
     };
     
-    window.addEventListener('keydown', handleEscape);
-    return () => window.removeEventListener('keydown', handleEscape);
-  }, [isPaused]);
-
-  const startGameLoop = () => {
-    const gameLoop = () => {
-      if (!engineRef.current || !vehicleRef.current) return;
-      
-      const engine = engineRef.current;
-      const vehicle = vehicleRef.current;
-      
-      // Update engine (physics, time, particles)
-      engine.update();
-      
-      // Update vehicle
-      vehicle.update(engine.input, engine.delta);
-      
-      // Update camera
-      engine.updateCamera(vehicle.mesh);
-      
-      // Update conductor system
-      if (conductorRef.current) {
-        const isMoving = vehicle.getSpeed() > 5;
-        conductorRef.current.update(isMoving, vehicle.getSpeed());
-      }
-      
-      // Update police system
-      if (policeRef.current) {
-        policeRef.current.update(vehicle.getSpeed());
-      }
-      
-      // Update game state for HUD
-      setGameState(prev => ({
-        ...prev,
-        speed: Math.round(vehicle.getSpeed()),
-        rpm: Math.round(vehicle.getRPM()),
-        gear: vehicle.getGear(),
-        fps: engine.getFPS(),
-        time: engine.timeSystem ? engine.timeSystem.getTimeOfDay() : '12:00'
-      }));
-      
-      // Render scene
-      engine.render();
-      
-      animationFrameRef.current = requestAnimationFrame(gameLoop);
+    const handleKeyUp = (e) => {
+      keysPressed.current[e.key.toLowerCase()] = false;
     };
     
-    gameLoop();
-  };
-
-  const stopGameLoop = () => {
-    if (animationFrameRef.current) {
-      cancelAnimationFrame(animationFrameRef.current);
-    }
-  };
-
-  const handlePause = () => {
-    setIsPaused(!isPaused);
-    if (!isPaused) {
-      stopGameLoop();
-    } else {
-      startGameLoop();
-    }
-  };
-
-  const handleReset = () => {
-    if (vehicleRef.current && worldRef.current) {
-      const spawnPos = worldRef.current.getSpawnPosition();
-      vehicleRef.current.reset(spawnPos);
-      setGameState(prev => ({
-        ...prev,
-        speed: 0,
-        rpm: 800,
-        gear: 1
-      }));
-    }
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+    
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
+  }, [onExit]);
+  
+  // Game loop
+  useEffect(() => {
+    if (isPaused) return;
+    
+    const gameLoop = setInterval(() => {
+      const keys = keysPressed.current;
+      
+      // Acceleration
+      if (keys['w'] || keys['arrowup']) {
+        setSpeed(prev => Math.min(prev + 2, 120));
+        setRpm(prev => Math.min(prev + 100, 7000));
+      } else {
+        setSpeed(prev => Math.max(prev - 1, 0));
+        setRpm(prev => Math.max(prev - 50, 800));
+      }
+      
+      // Braking
+      if (keys['s'] || keys['arrowdown']) {
+        setSpeed(prev => Math.max(prev - 3, 0));
+      }
+      
+      // Steering
+      let steerAmount = 0;
+      if (keys['a'] || keys['arrowleft']) {
+        steerAmount = 0.02;
+      }
+      if (keys['d'] || keys['arrowright']) {
+        steerAmount = -0.02;
+      }
+      
+      // Update position
+      setPosition(prev => {
+        const [x, y, z] = prev;
+        const currentRotation = rotation[1];
+        const moveSpeed = speed / 100;
+        
+        return [
+          x + Math.sin(currentRotation) * moveSpeed,
+          y,
+          z + Math.cos(currentRotation) * moveSpeed
+        ];
+      });
+      
+      // Update rotation
+      if (speed > 5) {
+        setRotation(prev => [prev[0], prev[1] + steerAmount, prev[2]]);
+      }
+      
+      // Auto gear shifting
+      if (rpm > 6000 && gear < 5) {
+        setGear(prev => prev + 1);
+        setRpm(2000);
+      }
+      if (rpm < 1500 && gear > 1 && speed > 10) {
+        setGear(prev => prev - 1);
+        setRpm(4000);
+      }
+      
+      // Police trigger
+      if (speed > 100 && Math.random() < 0.01) {
+        setPoliceChaseActive(true);
+      }
+      
+      // Random passenger spawns
+      if (speed < 5 && Math.random() < 0.05 && passengers < 14) {
+        const newPassengers = Math.min(passengers + Math.floor(Math.random() * 3) + 1, 14);
+        setPassengers(newPassengers);
+        setMoney(prev => prev + 50);
+        
+        setCurrentMission(prev => ({
+          ...prev,
+          progress: Math.min(prev.progress + 33, 100)
+        }));
+      }
+      
+    }, 1000 / 60);
+    
+    return () => clearInterval(gameLoop);
+  }, [isPaused, speed, rotation, gear, rpm, passengers]);
+  
+  // Format time
+  const formatTime = () => {
+    const hours = Math.floor(gameTime);
+    const minutes = Math.floor((gameTime % 1) * 60);
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
   };
 
   return (
-    <div className="game3d-container">
-      <canvas ref={canvasRef} className="game3d-canvas" />
-      
-      <div className="game3d-hud">
-        {/* Top Left - Vehicle Info */}
-        <div className="hud-top-left">
-          <div className="matatu-name">{selectedMatatu.name}</div>
-          <div className="route-info">{selectedMatatu.route}</div>
-          <div className="matatu-type">{selectedMatatu.type.replace('_', ' ').toUpperCase()}</div>
-        </div>
-        
-        {/* Top Right - Stats */}
-        <div className="hud-top-right">
-          <div className="hud-item">
-            <span className="hud-label">TIME</span>
-            <span className="hud-value">{gameState.time}</span>
-          </div>
-          <div className="hud-item">
-            <span className="hud-label">SCORE</span>
-            <span className="hud-value">{gameState.score}</span>
-          </div>
-          <div className="hud-item">
-            <span className="hud-label">MONEY</span>
-            <span className="hud-value">KES {gameState.money}</span>
-          </div>
-          <div className="hud-item">
-            <span className="hud-label">PASSENGERS</span>
-            <span className="hud-value">{gameState.passengers}/14</span>
-          </div>
-        </div>
-        
-        {/* Bottom Left - Speedometer */}
-        <div className="speedometer">
-          <div className="speed-display">
-            <span className="speed-value">{gameState.speed}</span>
-            <span className="speed-unit">KM/H</span>
-          </div>
-          <div className="rpm-display">
-            <span className="rpm-label">RPM</span>
-            <span className="rpm-value">{gameState.rpm}</span>
-          </div>
-          <div className="gear-display">
-            <span className="gear-label">GEAR</span>
-            <span className="gear-value">{gameState.gear}</span>
-          </div>
-          {vehicleRef.current?.isDrifting && (
-            <div className="drift-indicator">
-              <span>🔥 DRIFT MODE</span>
-            </div>
+    <div style={{ width: '100vw', height: '100vh', position: 'relative' }}>
+      <Canvas
+        shadows
+        camera={{ position: [0, 5, -10], fov: 75 }}
+        gl={{ 
+          antialias: true,
+          toneMapping: THREE.ACESFilmicToneMapping,
+          toneMappingExposure: 1.2
+        }}
+      >
+        <Suspense fallback={null}>
+          {/* Lighting */}
+          <ambientLight intensity={isNight ? 0.2 : 0.5} />
+          <directionalLight
+            position={[100, 100, 50]}
+            intensity={isNight ? 0.3 : 1}
+            castShadow
+            shadow-mapSize-width={2048}
+            shadow-mapSize-height={2048}
+          />
+          
+          {/* Sky */}
+          <Sky
+            distance={450000}
+            sunPosition={[100, isNight ? -20 : 20, 100]}
+            inclination={isNight ? 0.6 : 0.49}
+            azimuth={0.25}
+          />
+          
+          {/* Stars at night */}
+          {isNight && (
+            <Stars
+              radius={100}
+              depth={50}
+              count={5000}
+              factor={4}
+              saturation={0}
+              fade
+              speed={1}
+            />
           )}
+          
+          {/* Environment */}
+          <Environment preset={isNight ? 'night' : 'sunset'} />
+          
+          {/* Ground */}
+          <Ground />
+          
+          {/* Road */}
+          <Road position={[0, 0, position[2]]} />
+          
+          {/* Buildings */}
+          {[...Array(20)].map((_, i) => (
+            <Building
+              key={i}
+              position={[
+                i % 2 === 0 ? -20 : 20,
+                Math.random() * 20 + 10,
+                i * 50 - 500 + position[2]
+              ]}
+              height={Math.random() * 30 + 10}
+              color={`hsl(${Math.random() * 60 + 180}, 20%, 30%)`}
+            />
+          ))}
+          
+          {/* Player Matatu */}
+          <Matatu3D
+            position={position}
+            rotation={rotation}
+            color={selectedMatatu?.color || '#FFD700'}
+            hasUnderglow={true}
+            speed={speed}
+          />
+          
+          {/* Post-Processing */}
+          <PostProcessing speed={speed} isNight={isNight} />
+        </Suspense>
+      </Canvas>
+      
+      {/* Improved HUD */}
+      <ImprovedHUD
+        speed={speed}
+        rpm={rpm}
+        gear={gear}
+        money={money}
+        passengers={passengers}
+        maxPassengers={14}
+        time={formatTime()}
+        route={selectedMatatu?.route || 'CBD - Ngong'}
+        mission={currentMission}
+        health={health}
+      />
+      
+      {/* Pause Menu */}
+      {isPaused && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          background: 'rgba(0,0,0,0.9)',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '30px',
+          zIndex: 1000
+        }}>
+          <h1 style={{ 
+            fontSize: '72px', 
+            color: '#FFD700',
+            textShadow: '0 0 40px rgba(255,215,0,0.8)',
+            fontFamily: 'Poppins'
+          }}>
+            PAUSED
+          </h1>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+            <button
+              onClick={() => setIsPaused(false)}
+              style={{
+                padding: '15px 40px',
+                fontSize: '20px',
+                background: '#FFD700',
+                border: 'none',
+                borderRadius: '12px',
+                cursor: 'pointer',
+                fontWeight: '700',
+                fontFamily: 'Poppins'
+              }}
+            >
+              ▶ RESUME
+            </button>
+            <button
+              onClick={onExit}
+              style={{
+                padding: '15px 40px',
+                fontSize: '20px',
+                background: 'rgba(255,255,255,0.1)',
+                color: '#FFF',
+                border: '2px solid #FFD700',
+                borderRadius: '12px',
+                cursor: 'pointer',
+                fontWeight: '700',
+                fontFamily: 'Poppins'
+              }}
+            >
+              EXIT TO MENU
+            </button>
+          </div>
         </div>
-        
-        {/* Bottom Right - Minimap */}
-        <div className="minimap">
-          <div className="minimap-label">NAIROBI MAP</div>
-          <div className="minimap-canvas">
-            <div className="player-dot"></div>
-            <div className="minimap-roads"></div>
-          </div>
-          <div className="minimap-info">
-            <span>Speed: {gameState.speed} km/h</span>
-            <span>Camera: {engineRef.current?.cameraMode || 'chase'}</span>
-          </div>
-        </div>
-        
-        {/* FPS Counter */}
-        <div className="fps-counter">
-          {gameState.fps} FPS
-        </div>
-        
-        {/* Controls Guide (shows for 5 seconds) */}
-        {showControls && (
-          <div className="controls-guide">
-            <h3>🎮 CONTROLS</h3>
-            <div className="controls-grid">
-              <div className="control-row">
-                <span className="control-key">W / ↑</span>
-                <span className="control-desc">Accelerate</span>
-              </div>
-              <div className="control-row">
-                <span className="control-key">S / ↓</span>
-                <span className="control-desc">Reverse</span>
-              </div>
-              <div className="control-row">
-                <span className="control-key">A / ←</span>
-                <span className="control-desc">Turn Left</span>
-              </div>
-              <div className="control-row">
-                <span className="control-key">D / →</span>
-                <span className="control-desc">Turn Right</span>
-              </div>
-              <div className="control-row">
-                <span className="control-key">SPACE</span>
-                <span className="control-desc">Handbrake (Drift)</span>
-              </div>
-              <div className="control-row">
-                <span className="control-key">SHIFT</span>
-                <span className="control-desc">Brake</span>
-              </div>
-              <div className="control-row">
-                <span className="control-key">H</span>
-                <span className="control-desc">Horn</span>
-              </div>
-              <div className="control-row">
-                <span className="control-key">C</span>
-                <span className="control-desc">Change Camera</span>
-              </div>
-              <div className="control-row">
-                <span className="control-key">ESC</span>
-                <span className="control-desc">Pause</span>
-              </div>
-            </div>
-            <p className="controls-hint">Controls will hide in {Math.ceil((5000 - Date.now()) / 1000)}s...</p>
-          </div>
-        )}
-        
-        {/* Pause Menu */}
-        {isPaused && (
-          <div className="pause-overlay">
-            <div className="pause-menu">
-              <h2>⏸️ GAME PAUSED</h2>
-              <p className="pause-subtitle">Tumesimama stage kidogo</p>
-              <div className="pause-buttons">
-                <button className="btn btn-primary" onClick={handlePause}>
-                  ▶️ RESUME
-                </button>
-                <button className="btn btn-secondary" onClick={handleReset}>
-                  🔄 RESET POSITION
-                </button>
-                <button className="btn btn-danger" onClick={onExit}>
-                  🚪 EXIT TO MENU
-                </button>
-              </div>
-              <div className="pause-stats">
-                <div className="stat">
-                  <span>Distance:</span>
-                  <strong>{Math.round(gameState.score / 10)} km</strong>
-                </div>
-                <div className="stat">
-                  <span>Top Speed:</span>
-                  <strong>{gameState.speed} km/h</strong>
-                </div>
-                <div className="stat">
-                  <span>Earnings:</span>
-                  <strong>KES {gameState.money}</strong>
-                </div>
-                <div className="stat">
-                  <span>Time:</span>
-                  <strong>{gameState.time}</strong>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+      )}
+      
+      {/* Controls */}
+      <div style={{
+        position: 'fixed',
+        bottom: '20px',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        background: 'rgba(0,0,0,0.7)',
+        padding: '10px 20px',
+        borderRadius: '10px',
+        color: '#FFF',
+        fontSize: '12px',
+        fontFamily: 'Poppins',
+        display: 'flex',
+        gap: '20px',
+        border: '1px solid rgba(255,215,0,0.3)',
+        zIndex: 10
+      }}>
+        <span><strong>W/↑</strong> Accelerate</span>
+        <span><strong>S/↓</strong> Brake</span>
+        <span><strong>A/D</strong> Steer</span>
+        <span><strong>ESC</strong> Pause</span>
+        <span><strong>Q</strong> Exit</span>
       </div>
     </div>
   );
