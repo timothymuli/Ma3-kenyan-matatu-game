@@ -1,84 +1,68 @@
-/**
- * MA3 - Game Constants
- * All configuration values
- */
-
-// Lanes (3 lanes)
-export const LANES = [16.66, 50, 83.33]; // Percentage positions
-export const LANE_COUNT = 3;
-
-// Game timing
-export const GAME_FPS = 60;
-export const FRAME_DURATION = 1000 / GAME_FPS;
-
-// Speeds
-export const BASE_SPEED = 6;
-export const SPEED_INCREASE_PER_LEVEL = 0.3;
-export const MAX_SPEED = 18;
-
-// Spawn rates (ms)
-export const OBSTACLE_SPAWN_RATE = 800;
-export const PASSENGER_SPAWN_RATE = 5000;
-export const HAWKER_SPAWN_RATE = 15000;
-export const POLICE_SPAWN_RATE = 20000;
-
-// Collision
-export const COLLISION_THRESHOLD = 40;
-
-// Scoring
-export const POINTS_PER_SECOND = 1;
-export const PASSENGER_POINTS = 10;
-export const MPESA_POINTS = 5;
-export const FULL_MATATU_BONUS = 100;
-
-// Traffic lights
-export const TRAFFIC_LIGHT_DURATION = {
-  GREEN: 8000,   // 8 seconds
-  YELLOW: 2000,  // 2 seconds
-  RED: 10000     // 10 seconds
-};
-
-// Police
-export const POLICE_CATCH_DISTANCE = 100;
-export const POLICE_SPEED_MULTIPLIER = 1.3;
-
-// Sizes
-export const GAME_WIDTH = 800;
-export const GAME_HEIGHT = 600;
-
-// Game states
+// GAME CONSTANTS
 export const GAME_STATES = {
-  MENU:  'menu',
-  MATATU_SELECT: 'matatuSelect',
-  ROUTE_SELECT: 'routeSelect',
+  MENU: 'menu',
+  MATATU_SELECT: 'matatu_select',
   PLAYING: 'playing',
   PAUSED: 'paused',
-  GAME_OVER: 'gameOver',
-  POLICE_STATION: 'policeStation',
-  HOW_TO_PLAY: 'howToPlay'
+  GAME_OVER: 'game_over',
+  POLICE_STATION: 'police_station'
 };
 
-// Storage keys
-export const STORAGE_KEYS = {
-  HIGH_SCORE: 'ma3HighScore',
-  TOTAL_GAMES: 'ma3TotalGames',
-  TOTAL_PASSENGERS: 'ma3TotalPassengers',
-  TOTAL_EARNINGS: 'ma3TotalEarnings'
+export const LANES = {
+  LEFT: 0,
+  CENTER: 1,
+  RIGHT: 2,
+  POSITIONS: [25, 50, 75]
 };
 
-// Keyboard
-export const KEYS = {
-  LEFT: ['ArrowLeft', 'a', 'A'],
-  RIGHT: ['ArrowRight', 'd', 'D'],
-  PAUSE: [' ', 'p', 'P'],
-  ENTER: ['Enter']
+export const SPEEDS = {
+  BASE: 5,
+  MIN: 3,
+  MAX: 15,
+  INCREASE_PER_LEVEL: 0.5
 };
+
+export const SPAWN_RATES = {
+  OBSTACLE: 1500,
+  COLLECTIBLE: 3000,
+  TRAFFIC_LIGHT: 30000,
+  POLICE: 20000
+};
+
+export const POINTS = {
+  TIME: 1,
+  PASSENGER_CASH: 10,
+  PASSENGER_MPESA: 15,
+  FUEL: 20,
+  FULL_MATATU: 100,
+  POLICE_FINE: -100,
+  COLLISION: 0
+};
+
+export const COLLISION_THRESHOLD = 50;
+
+export const GAME_LOOP_FPS = 60;
+export const GAME_LOOP_INTERVAL = 1000 / GAME_LOOP_FPS;
+
+export const TRAFFIC_LIGHT_DURATION = {
+  GREEN: 10000,
+  YELLOW: 2000,
+  RED: 8000
+};
+
+export const POLICE_CHASE_SPEED_MULTIPLIER = 1.5;
+
+export const MATATU_CAPACITY = 14;
 
 export default {
-  LANES,
-  GAME_FPS,
-  BASE_SPEED,
   GAME_STATES,
-  STORAGE_KEYS,
-  KEYS
+  LANES,
+  SPEEDS,
+  SPAWN_RATES,
+  POINTS,
+  COLLISION_THRESHOLD,
+  GAME_LOOP_FPS,
+  TRAFFIC_LIGHT_DURATION,
+  POLICE_CHASE_SPEED_MULTIPLIER,
+  MATATU_CAPACITY
 };

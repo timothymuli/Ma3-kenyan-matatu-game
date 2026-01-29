@@ -60,5 +60,3 @@ MIT License - Feel free to fork and improve!
 
 🙏 Credits
 Built with love for Kenyan matatu culture 🇰🇪
-
-**Twende! Let's go! ** 🚌💨

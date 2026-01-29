@@ -3,16 +3,14 @@ text
 .
 ├── README.md
 ├── README.old.md
-├── create-jira-issues.js
-├── jira
-│   ├── create-jira-issues.js.save
-│   ├── jira.js
-│   ├── package-lock.json
-│   ├── package.json
-│   └── test-auth.js
 ├── package-lock.json
 ├── package.json
 ├── public
+│   ├── assets
+│   │   ├── backgrounds
+│   │   ├── roads
+│   │   ├── ui
+│   │   └── vehicles
 │   ├── favicon.ico
 │   ├── index.html
 │   ├── logo192.png
@@ -26,18 +24,42 @@ text
     ├── assets
     │   └── sounds
     ├── components
+    │   ├── HUD.css
+    │   ├── HUD.jsx
+    │   ├── IntroVideo.css
+    │   ├── IntroVideo.jsx
+    │   ├── MatatuSelect.css
+    │   ├── MatatuSelect.jsx
+    │   ├── RadioPlayer.css
+    │   ├── RadioPlayer.jsx
+    │   ├── Road.css
+    │   ├── Road.jsx
+    │   ├── Vehicle.css
+    │   ├── Vehicle.jsx
     │   ├── game
     │   ├── screens
     │   └── ui
     ├── data
     │   ├── buildings.js
     │   ├── cars.js
+    │   ├── elCroco.js
     │   ├── hawkers.js
+    │   ├── matatuMusicReal.js
     │   ├── matatus.js
     │   ├── policeStations.js
     │   ├── routes.js
     │   ├── sheng.js
     │   └── stages.js
+    ├── game3d
+    │   ├── components
+    │   │   └── Game3D.jsx
+    │   ├── engine
+    │   │   ├── GameEngine.js
+    │   │   ├── NairobiWorld.js
+    │   │   ├── VehiclePhysics.js
+    │   │   └── index.js
+    │   └── styles
+    │       └── Game3D.css
     ├── hooks
     │   ├── useGameLoop.js
     │   ├── useKeyboard.js
@@ -53,12 +75,13 @@ text
     │   ├── game.css
     │   └── kenyan-theme.css
     └── utils
+        ├── audioManager.js
         ├── constants.js
         ├── gameLogic.js
         ├── helpers.js
         ├── policeSystem.js
         └── trafficRules.js
 
-14 directories, 44 files
+22 directories, 59 files
 
 <!-- TREE_END -->
