@@ -1,20 +1,21 @@
 import React, { useState } from 'react';
 import LoadingScreen from './components/LoadingScreen';
+import MainMenu from './components/MainMenu';
 import IntroVideo from './components/IntroVideo';
 import MatatuSelect from './components/MatatuSelect';
 import Game3D from './game3d/components/Game3D';
-import { matatus } from './data/matatus';
+import { MATATUS } from './data/matatus';
 import './App.css';
 
 function App() {
-  const [gameState, setGameState] = useState('loading'); // loading → intro → select → playing
+  const [gameState, setGameState] = useState('loading'); // loading → main-menu → select → playing
   const [selectedMatatu, setSelectedMatatu] = useState(null);
 
   const handleLoadComplete = () => {
-    setGameState('intro');
+    setGameState('main-menu');
   };
 
-  const handleIntroComplete = () => {
+  const handleStartGame = () => {
     setGameState('select');
   };
 
@@ -24,7 +25,7 @@ function App() {
   };
 
   const handleExit = () => {
-    setGameState('select');
+    setGameState('main-menu');
     setSelectedMatatu(null);
   };
 
@@ -34,13 +35,17 @@ function App() {
         <LoadingScreen onLoadComplete={handleLoadComplete} />
       )}
       
-      {gameState === 'intro' && (
-        <IntroVideo onComplete={handleIntroComplete} />
+      {gameState === 'main-menu' && (
+        <MainMenu 
+          onStartGame={handleStartGame}
+          onOpenGarage={() => alert('Garage coming soon!')}
+          onOpenLeaderboard={() => alert('Leaderboard coming soon!')}
+        />
       )}
       
       {gameState === 'select' && (
         <MatatuSelect 
-          matatus={matatus} 
+          matatus={MATATUS} 
           onSelect={handleMatatuSelect} 
         />
       )}
