@@ -7,6 +7,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import GameEngine from '../engine/GameEngine';
 import VehiclePhysics from '../engine/VehiclePhysics';
 import NairobiWorld from '../engine/NairobiWorld';
+import ConductorSystem from '../systems/ConductorSystem';
+import PoliceSystem from '../systems/PoliceSystem';
 import '../styles/Game3D.css';
 
 const Game3D = ({ selectedMatatu, onExit }) => {
@@ -14,6 +16,8 @@ const Game3D = ({ selectedMatatu, onExit }) => {
   const engineRef = useRef(null);
   const vehicleRef = useRef(null);
   const worldRef = useRef(null);
+  const conductorRef = useRef(null);
+  const policeRef = useRef(null);
   const animationFrameRef = useRef(null);
   
   const [gameState, setGameState] = useState({
@@ -23,7 +27,8 @@ const Game3D = ({ selectedMatatu, onExit }) => {
     score: 0,
     money: 0,
     passengers: 0,
-    fps: 60
+    fps: 60,
+    time: '12:00'
   });
   
   const [isPaused, setIsPaused] = useState(false);
@@ -40,6 +45,8 @@ const Game3D = ({ selectedMatatu, onExit }) => {
       engineRef.current = new GameEngine(canvasRef.current);
       worldRef.current = new NairobiWorld(engineRef.current);
       vehicleRef.current = new VehiclePhysics(engineRef.current, selectedMatatu);
+      conductorRef.current = new ConductorSystem();
+      policeRef.current = new PoliceSystem();
       
       startGameLoop();
       
@@ -80,12 +87,24 @@ const Game3D = ({ selectedMatatu, onExit }) => {
       vehicle.update(engine.input, engine.delta);
       engine.updateCamera(vehicle.mesh);
       
+      // Update conductor system
+      if (conductorRef.current) {
+        const isMoving = vehicle.getSpeed() > 5;
+        conductorRef.current.update(isMoving, vehicle.getSpeed());
+      }
+      
+      // Update police system
+      if (policeRef.current) {
+        policeRef.current.update(vehicle.getSpeed());
+      }
+      
       setGameState(prev => ({
         ...prev,
         speed: Math.round(vehicle.getSpeed()),
         rpm: Math.round(vehicle.getRPM()),
         gear: vehicle.getGear(),
-        fps: engine.getFPS()
+        fps: engine.getFPS(),
+        time: engine.timeSystem ? engine.timeSystem.getTimeOfDay() : '12:00'
       }));
       
       engine.render();
@@ -132,6 +151,10 @@ const Game3D = ({ selectedMatatu, onExit }) => {
         
         {/* Top Right - Stats */}
         <div className="hud-top-right">
+          <div className="hud-item">
+            <span className="hud-label">TIME</span>
+            <span className="hud-value">{gameState.time}</span>
+          </div>
           <div className="hud-item">
             <span className="hud-label">SCORE</span>
             <span className="hud-value">{gameState.score}</span>
