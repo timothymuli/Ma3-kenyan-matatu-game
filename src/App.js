@@ -8,7 +8,7 @@ import { MATATUS } from './data/matatus';
 import './App.css';
 
 function App() {
-  const [gameState, setGameState] = useState('loading'); // loading → main-menu → select → playing
+  const [gameState, setGameState] = useState('loading');
   const [selectedMatatu, setSelectedMatatu] = useState(null);
 
   const handleLoadComplete = () => {
